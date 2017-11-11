@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kathmandu Map</title>
+    <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+    <div class="container">
+      	<div class="options-box">
+        	<h1>Find anything in Kathmandu</h1>
+        	<div>
+	            <input id="zoom-to-area-text" type="text" placeholder="Enter your favorite area!">
+	            <input id="zoom-to-area" type="button" value="Zoom">
+        	</div>
+        </div>
+        
+	    <div id="map"></div>
+    </div>
+
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6UxP3FZOY5rLgBbe_aG201JJr2kbIeoA&v=3&callback=initMap"></script>
+
+    <script src="knockout-3.2.0.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>
