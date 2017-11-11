@@ -86,6 +86,8 @@ function initMap() {
     {title: 'Budhanilkantha', location: {lat: 27.7654, lng: 85.3653}},
     {title: 'Swayambhu', location: {lat: 27.7148, lng: 85.2903}}          
   ];        
+        
+  var largeInfowindow = new google.maps.InfoWindow();  
   var defaultIcon = makeMarkerIcon('0091ff');
   var highlightedIcon = makeMarkerIcon('FF0000');
 
@@ -111,23 +113,20 @@ function initMap() {
 
       marker.addListener('mouseout', function() {
         this.setIcon(defaultIcon);
-      });                       
+      });       
 
-
+      marker.addListener('click',function() {
+        populateInfoWindow(this, largeInfowindow);
+      });
   }
 
-  document.getElementById('zoom-to-area').addEventListener('click', function() {
-    //debugger
-    zoomToArea();
-    //debugger
-  })
 
   // Extend the boundaries of the map for each marker and display the marker
   for (var i = 0; i < markers.length; i++) {
         markers[i].setMap(map);
         bounds.extend(markers[i].position);
   }
-      map.fitBounds(bounds);
+  map.fitBounds(bounds);
 
 
   function makeMarkerIcon(markerColor) {
@@ -139,32 +138,19 @@ function initMap() {
         new google.maps.Point(10, 34),
         new google.maps.Size(21,34));
         return markerImage;
-  }  
+  }
 
-  function zoomToArea() {
-    var geocoder = new google.maps.Geocoder();
-    var address = document.getElementById('zoom-to-area-text').value;
-    var request = {
-       'address': address
-        //componentRestrictions: {country: 'Nepal'}
-      }
-
-    if (address == '') {
-      window.alert('You must enter an area, or address.');
+  function populateInfoWindow(marker, infowindow) {
+    // Check to make sure the infowindow is not already opened on this marker.
+    if (infowindow.marker != marker) {
+      infowindow.marker = marker;
+      infowindow.setContent('<div>' + marker.title + '</div>');
+      infowindow.open(map, marker);
+      // Make sure the marker property is cleared if the infowindow is closed.
+      infowindow.addListener('closeclick',function(){
+        infowindow.setMarker = null;
+      });
     }
-    else {
-      geocoder.geocode(request, function(results, status) {
-     //geocoder.geocode({componentRestrictions: {country: 'Nepal'}}, function(results, status)   
-        if (status == 'OK') {
-          map.setCenter(results[0].geometry.location);
-          map.setZoom(15);
-        } else {
-          alert('We could not find the location: "'+ address +'" - try entering a more' +
-                    ' specific place.');
-        }
-      });          
-    }
+  }
 
-  }  
-               
 }
