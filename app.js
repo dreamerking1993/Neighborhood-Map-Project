@@ -1,5 +1,14 @@
 var map;
 var markers = [];
+var locations = [
+  {title: 'Pashupati Nath', location: {lat: 27.7105, lng: 85.3487}},
+  {title: 'Bhaktapur Durbar Square', location: {lat: 27.6721, lng: 85.4283}},
+  {title: 'Patan Durbar Square', location: {lat: 27.6727, lng: 85.3253}},
+  {title: 'Basantapur', location: {lat: 27.7042, lng: 85.3065}},
+  {title: 'Sundarijal', location: {lat: 27.7909, lng: 85.4272}},
+  {title: 'Budhanilkantha', location: {lat: 27.7654, lng: 85.3653}},
+  {title: 'Swayambhu', location: {lat: 27.7148, lng: 85.2903}}          
+];
 function initMap() {
   var styles = [
     {
@@ -75,17 +84,7 @@ function initMap() {
       mapTypeControl: false            
   });
                   
-  //var Pashupati = {lat: 27.7105, lng: 85.3487}
-
-  var locations = [
-    {title: 'Pashupati Nath', location: {lat: 27.7105, lng: 85.3487}},
-    {title: 'Bhaktapur Durbar Square', location: {lat: 27.6721, lng: 85.4283}},
-    {title: 'Patan Durbar Square', location: {lat: 27.6727, lng: 85.3253}},
-    {title: 'Basantapur', location: {lat: 27.7042, lng: 85.3065}},
-    {title: 'Sundarijal', location: {lat: 27.7909, lng: 85.4272}},
-    {title: 'Budhanilkantha', location: {lat: 27.7654, lng: 85.3653}},
-    {title: 'Swayambhu', location: {lat: 27.7148, lng: 85.2903}}          
-  ];        
+  //var Pashupati = {lat: 27.7105, lng: 85.3487}        
         
   var largeInfowindow = new google.maps.InfoWindow();  
   var defaultIcon = makeMarkerIcon('0091ff');
@@ -154,3 +153,13 @@ function initMap() {
   }
 
 }
+
+var ViewModel = function() {
+    var self = this;
+    this.locationList = ko.observableArray();
+    for(var j = 0; j<locations.length; j++) {
+        this.locationList.push(locations[j]);
+    }
+}  
+
+ko.applyBindings(new ViewModel());
