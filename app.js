@@ -1,81 +1,85 @@
 var map, largeInfowindow;
 var markers = [];
 var locations = [
-  {title: 'Pashupati Nath', location: {lat: 27.7105, lng: 85.3487}},
+  {title: 'Pashupatinath Temple', location: {lat: 27.7105, lng: 85.3487}},
   {title: 'Bhaktapur Durbar Square', location: {lat: 27.6721, lng: 85.4283}},
   {title: 'Patan Durbar Square', location: {lat: 27.6727, lng: 85.3253}},
-  {title: 'Basantapur', location: {lat: 27.7042, lng: 85.3065}},
+  {title: 'Kathmandu Durbar Square', location: {lat: 27.7043, lng: 85.3074}},
   {title: 'Sundarijal', location: {lat: 27.7909, lng: 85.4272}},
-  {title: 'Budhanilkantha', location: {lat: 27.7654, lng: 85.3653}},
-  {title: 'Swayambhu', location: {lat: 27.7148, lng: 85.2903}}          
+  {title: 'Budhanilkantha Temple', location: {lat: 27.7654, lng: 85.3653}},
+  {title: 'Swayambhu Stupa', location: {lat: 27.7148, lng: 85.2903}},
+  {title: 'Boudha Stupa', location: {lat: 27.7214, lng: 85.3619}},
+  {title: 'Changu Narayan Temple', location: {lat: 27.7162, lng: 85.4278}}                      
+]; 
+
+var styles = [
+  {
+    featureType: 'water',
+    stylers: [
+      { color: '#19a0d8' }
+    ]
+  },{
+    featureType: 'administrative',
+    elementType: 'labels.text.stroke',
+    stylers: [
+      { color: '#ffffff' },
+      { weight: 6 }
+    ]
+  },{
+    featureType: 'administrative',
+    elementType: 'labels.text.fill',
+    stylers: [
+      { color: '#e85113' }
+    ]
+  },{
+    featureType: 'road.highway',
+    elementType: 'geometry.stroke',
+    stylers: [
+      { color: '#efe9e4' },
+      { lightness: -40 }
+    ]
+  },{
+    featureType: 'transit.station',
+    stylers: [
+      { weight: 9 },
+      { hue: '#e85113' }
+    ]
+  },{
+    featureType: 'road.highway',
+    elementType: 'labels.icon',
+    stylers: [
+      { visibility: 'off' }
+    ]
+  },{
+    featureType: 'water',
+    elementType: 'labels.text.stroke',
+    stylers: [
+      { lightness: 100 }
+    ]
+  },{
+    featureType: 'water',
+    elementType: 'labels.text.fill',
+    stylers: [
+      { lightness: -100 }
+    ]
+  },{
+    featureType: 'poi',
+    elementType: 'geometry',
+    stylers: [
+      { visibility: 'on' },
+      { color: '#f0e4d3' }
+    ]
+  },{
+    featureType: 'road.highway',
+    elementType: 'geometry.fill',
+    stylers: [
+      { color: '#efe9e4' },
+      { lightness: -25 }
+    ]
+  }
 ];
+
 function initMap() {
-  var styles = [
-    {
-      featureType: 'water',
-      stylers: [
-        { color: '#19a0d8' }
-      ]
-    },{
-      featureType: 'administrative',
-      elementType: 'labels.text.stroke',
-      stylers: [
-        { color: '#ffffff' },
-        { weight: 6 }
-      ]
-    },{
-      featureType: 'administrative',
-      elementType: 'labels.text.fill',
-      stylers: [
-        { color: '#e85113' }
-      ]
-    },{
-      featureType: 'road.highway',
-      elementType: 'geometry.stroke',
-      stylers: [
-        { color: '#efe9e4' },
-        { lightness: -40 }
-      ]
-    },{
-      featureType: 'transit.station',
-      stylers: [
-        { weight: 9 },
-        { hue: '#e85113' }
-      ]
-    },{
-      featureType: 'road.highway',
-      elementType: 'labels.icon',
-      stylers: [
-        { visibility: 'off' }
-      ]
-    },{
-      featureType: 'water',
-      elementType: 'labels.text.stroke',
-      stylers: [
-        { lightness: 100 }
-      ]
-    },{
-      featureType: 'water',
-      elementType: 'labels.text.fill',
-      stylers: [
-        { lightness: -100 }
-      ]
-    },{
-      featureType: 'poi',
-      elementType: 'geometry',
-      stylers: [
-        { visibility: 'on' },
-        { color: '#f0e4d3' }
-      ]
-    },{
-      featureType: 'road.highway',
-      elementType: 'geometry.fill',
-      stylers: [
-        { color: '#efe9e4' },
-        { lightness: -25 }
-      ]
-    }
-  ];
 
   map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: 27.723875, lng: 85.357847},
@@ -154,17 +158,34 @@ function populateInfoWindow(marker, infowindow) {
   }
 }
 
-var ViewModel = function() {
-    var self = this;
-    this.locationList = ko.observableArray();
-    for(var j = 0; j<locations.length; j++) {
-        this.locationList.push(locations[j]);
-    }
+var ViewModel = {
+    self: this,
+    query: ko.observable(''),
+    locationList: ko.observableArray([]),
+    ram: function() {    
+        for(var j = 0; j<locations.length; j++) {
+            this.locationList.push(locations[j]);
+        }
+    },       
 
-    this.popInfo = function(place) {
+    popInfo: function(place) {
         var index = locations.indexOf(place);
         populateInfoWindow(markers[index], largeInfowindow);
-    }
-}  
+    },
 
-ko.applyBindings(new ViewModel());
+    search: function(value) {
+
+        ViewModel.locationList.removeAll();
+        for( var k = 0; k<locations.length; k++) {
+            if (locations[k].title.toLowerCase().indexOf(value.toLowerCase()) >= 0) {
+                ViewModel.locationList.push(locations[k]);
+            }
+        }
+
+    }
+    
+}  
+ViewModel.ram();
+ViewModel.query.subscribe(ViewModel.search);
+
+ko.applyBindings(ViewModel);

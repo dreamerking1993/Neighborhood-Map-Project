@@ -7,11 +7,11 @@
 </head>
 
 <body>
-<div class="container">
+    <div class="container">
         <div class="options-box">
             <h1>Find anything in Kathmandu</h1>
             <div>
-               <input id="filter-text" type="text" placeholder="Enter what you want to filter">
+               <input id="filter-text" type="search" placeholder="Enter what you want to filter" data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off">
                <input id="filter" type="button" value="Filter">
             </div>
             
