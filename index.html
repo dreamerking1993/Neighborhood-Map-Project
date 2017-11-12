@@ -10,13 +10,22 @@
     <div class="container">
       	<div class="options-box">
         	<h1>Find anything in Kathmandu</h1>
-        </div>
+	        <div>
+	           <input id="filter-text" type="text" placeholder="Enter what you want to filter">
+	           <input id="filter" type="button" value="Filter">
+	        </div>
+            <ul id="location-list" data-bind="foreach: locationList">
+	        	<li>
+	        		<span data-bind="text: title, click: $parent.popInfo"></span>
+	        	</li>	
+	        </ul>	        
+	    </div>   
         
 	    <div id="map"></div>
     </div>
 
 
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6UxP3FZOY5rLgBbe_aG201JJr2kbIeoA&v=3&callback=initMap"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6UxP3FZOY5rLgBbe_aG201JJr2kbIeoA&v=3&callback=initialise"></script>
 
     <script src="knockout-3.2.0.js"></script>
     <script src="app.js"></script>
