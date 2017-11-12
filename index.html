@@ -12,7 +12,7 @@
             <h1>Find anything in Kathmandu</h1>
             <ul id="location-list" data-bind="foreach: locationList">
                 <li>
-                    <span data-bind="text: title"></span>
+                    <span data-bind="text: title, click: $parent.popInfo"></span>
                 </li>   
             </ul>           
         </div>   

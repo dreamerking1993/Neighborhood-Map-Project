@@ -1,4 +1,4 @@
-var map;
+var map, largeInfowindow;
 var markers = [];
 var locations = [
   {title: 'Pashupati Nath', location: {lat: 27.7105, lng: 85.3487}},
@@ -86,7 +86,7 @@ function initMap() {
                   
   //var Pashupati = {lat: 27.7105, lng: 85.3487}        
         
-  var largeInfowindow = new google.maps.InfoWindow();  
+  largeInfowindow = new google.maps.InfoWindow();  
   var defaultIcon = makeMarkerIcon('0091ff');
   var highlightedIcon = makeMarkerIcon('FF0000');
 
@@ -139,19 +139,19 @@ function initMap() {
         return markerImage;
   }
 
-  function populateInfoWindow(marker, infowindow) {
-    // Check to make sure the infowindow is not already opened on this marker.
-    if (infowindow.marker != marker) {
-      infowindow.marker = marker;
-      infowindow.setContent('<div>' + marker.title + '</div>');
-      infowindow.open(map, marker);
-      // Make sure the marker property is cleared if the infowindow is closed.
-      infowindow.addListener('closeclick',function(){
-        infowindow.setMarker = null;
-      });
-    }
-  }
+}
 
+function populateInfoWindow(marker, infowindow) {
+  // Check to make sure the infowindow is not already opened on this marker.
+  if (infowindow.marker != marker) {
+    infowindow.marker = marker;
+    infowindow.setContent('<div>' + marker.title + '</div>');
+    infowindow.open(map, marker);
+    // Make sure the marker property is cleared if the infowindow is closed.
+    infowindow.addListener('closeclick',function(){
+      infowindow.setMarker = null;
+    });
+  }
 }
 
 var ViewModel = function() {
@@ -159,6 +159,11 @@ var ViewModel = function() {
     this.locationList = ko.observableArray();
     for(var j = 0; j<locations.length; j++) {
         this.locationList.push(locations[j]);
+    }
+
+    this.popInfo = function(place) {
+        var index = locations.indexOf(place);
+        populateInfoWindow(markers[index], largeInfowindow);
     }
 }  
 
