@@ -195,6 +195,70 @@ var ViewModel = {
     
 }  
 
+/* #########fetching data from wikipedia */
+var textbox = document.getElementById("textbox");
+    var button = document.getElementById("button");
+    //var searchKeyword = document.getElementById("search-keyword").val;
+    const searchField = document.querySelector('#search-keyword');
+    let searchedForText;
+        
+    var tempscript = null, minchars, maxchars, attempts;
+
+    function startFetch(minimumCharacters, maximumCharacters, isRetry) {
+      event.preventDefault();
+      searchedForText = searchField.value;
+      if (tempscript) return; // a fetch is already in progress
+      if (!isRetry) {
+        attempts = 0;
+        minchars = minimumCharacters; // save params in case retry needed
+        maxchars = maximumCharacters;
+        button.disabled = true;
+        button.style.cursor = "wait";
+      }
+      tempscript = document.createElement("script");
+      tempscript.type = "text/javascript";
+      tempscript.id = "tempscript";
+      tempscript.src = "http://en.wikipedia.org/w/api.php"
+        + "?action=query&prop=extracts&exintro=&explaintext=&titles=" + searchedForText + " "
+        + "&exchars="+maxchars+"&format=json&callback=onFetchComplete&requestid="
+        + Math.floor(Math.random()*999999).toString();
+      document.body.appendChild(tempscript);
+      // onFetchComplete invoked when finished
+      //https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=Kathmandu
+    }
+
+    function onFetchComplete(data) {
+      document.body.removeChild(tempscript);
+      tempscript = null
+      var s = getFirstProp(data.query.pages).extract;
+      s = htmlDecode(stripTags(s));
+      if (s.length > minchars || attempts++ > 5) {
+        textbox.value = s;
+        button.disabled = false;
+        button.style.cursor = "auto";
+      } else {
+        startFetch(0, 0, true); // retry
+      }
+    }
+
+    function getFirstProp(obj) {
+      for (var i in obj) return obj[i];
+    }
+
+    // This next bit borrowed from Prototype / hacked together
+    // You may want to replace with something more robust
+    function stripTags(s) {
+      return s.replace(/<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?>|<\/\w+>/gi, "");
+    }
+    function htmlDecode(input){
+      var e = document.createElement("div");
+      e.innerHTML = input;
+      return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
+/*############################################## */
+
+
 ViewModel.ram();
 ViewModel.query.subscribe(ViewModel.search);
 

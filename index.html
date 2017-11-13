@@ -12,8 +12,11 @@
         <div class="options-box">
             <h1>Find anything in Kathmandu</h1>
             <div>
-               <input id="filter-text" type="search" placeholder="Enter what you want to filter" data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off">
-               <input id="filter" type="button" value="Filter">
+                <input id="search-keyword" type="text" name="search-keyword" placeholder="e.g. Android" required>
+                <p><button type="button" id="button" onclick="startFetch(100, 200)">Fetch</button></p>
+                <p><textarea id="textbox" style="width:250px; height:100px"></textarea></p>            
+                <input id="filter-text" type="search" placeholder="Enter what you want to filter" data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off">
+                <input id="filter" type="button" value="Filter">
             </div>
             
             <ul id="location-list" data-bind="foreach: locationList">
