@@ -1,4 +1,4 @@
-var map, largeInfowindow;
+var map, largeInfowindow, defaultIcon, bounds, highlightedIcon;
 var markers = [];
 var locations = [
   {title: 'Pashupatinath Temple', location: {lat: 27.7105, lng: 85.3487}},
@@ -8,7 +8,7 @@ var locations = [
   {title: 'Sundarijal', location: {lat: 27.7909, lng: 85.4272}},
   {title: 'Budhanilkantha Temple', location: {lat: 27.7654, lng: 85.3653}},
   {title: 'Swayambhu Stupa', location: {lat: 27.7148, lng: 85.2903}},
-  {title: 'Boudha Stupa', location: {lat: 27.7214, lng: 85.3619}},
+  {title: 'Boudhanath Stupa', location: {lat: 27.7214, lng: 85.3619}},
   {title: 'Changu Narayan Temple', location: {lat: 27.7162, lng: 85.4278}}                      
 ]; 
 
@@ -81,68 +81,73 @@ var styles = [
 
 function initMap() {
 
-  map = new google.maps.Map(document.getElementById('map'), {
-      center: {lat: 27.723875, lng: 85.357847},
-      zoom: 13,
-      styles: styles,
-      mapTypeControl: false            
-  });
-                  
-  //var Pashupati = {lat: 27.7105, lng: 85.3487}        
-        
-  largeInfowindow = new google.maps.InfoWindow();  
-  var defaultIcon = makeMarkerIcon('0091ff');
-  var highlightedIcon = makeMarkerIcon('FF0000');
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 27.723875, lng: 85.357847},
+        zoom: 13,
+        styles: styles,
+        mapTypeControl: false            
+    });
+                    
+          
+    largeInfowindow = new google.maps.InfoWindow();  
+    defaultIcon = makeMarkerIcon('0091ff');
+    highlightedIcon = makeMarkerIcon('FF0000');
 
-  var bounds = new google.maps.LatLngBounds();
+    bounds = new google.maps.LatLngBounds();
 
-  for ( var i = 0; i<locations.length; i++){
-      var position = locations[i].location;
-      var title = locations[i].title;
-      var marker = new google.maps.Marker({
-          position: position,
-          title: title,
-          animation: google.maps.Animation.DROP,
-          icon: defaultIcon,
-          id: i
-      });
-        // Push the marker to our array of markers.
-      markers.push(marker);
-      bounds.extend(markers[i].position);
+    placeMarker(ViewModel.locationList());
 
-      marker.addListener('mouseover', function() {
-        this.setIcon(highlightedIcon);
-      });  
-
-      marker.addListener('mouseout', function() {
-        this.setIcon(defaultIcon);
-      });       
-
-      marker.addListener('click',function() {
-        populateInfoWindow(this, largeInfowindow);
-      });
-  }
+    // Extend the boundaries of the map for each marker and display the marker
+    for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
+          bounds.extend(markers[i].position);
+    }
+    map.fitBounds(bounds);
 
 
-  // Extend the boundaries of the map for each marker and display the marker
-  for (var i = 0; i < markers.length; i++) {
-        markers[i].setMap(map);
+}
+
+function placeMarker(place) {
+    markers =[];
+    for ( var i = 0; i<place.length; i++){
+        var position = place[i].location;
+        var title = place[i].title;
+        var marker = new google.maps.Marker({
+            position: position,
+            title: title,
+            animation: google.maps.Animation.DROP,
+            icon: defaultIcon,
+            id: i
+        });
+          // Push the marker to our array of markers.
+        markers.push(marker);
         bounds.extend(markers[i].position);
-  }
-  map.fitBounds(bounds);
+
+        marker.addListener('mouseover', function() {
+          this.setIcon(highlightedIcon);
+        });  
+
+        marker.addListener('mouseout', function() {
+          this.setIcon(defaultIcon);
+        });       
+
+        marker.addListener('click',function() {
+          populateInfoWindow(this, largeInfowindow);
+        });
+
+    }  
+}
 
 
-  function makeMarkerIcon(markerColor) {
-        var markerImage = new google.maps.MarkerImage(
-        'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
-        '|40|_|%E2%80%A2',
-        new google.maps.Size(21, 34),
-        new google.maps.Point(0, 0),
-        new google.maps.Point(10, 34),
-        new google.maps.Size(21,34));
-        return markerImage;
-  }
-
+function makeMarkerIcon(markerColor) {
+      var markerImage = new google.maps.MarkerImage(
+      'http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|'+ markerColor +
+      '|40|_|%E2%80%A2',
+      new google.maps.Size(21, 34),
+      new google.maps.Point(0, 0),
+      new google.maps.Point(10, 34),
+      new google.maps.Size(21,34));
+      return markerImage;
 }
 
 function populateInfoWindow(marker, infowindow) {
@@ -153,7 +158,7 @@ function populateInfoWindow(marker, infowindow) {
     infowindow.open(map, marker);
     // Make sure the marker property is cleared if the infowindow is closed.
     infowindow.addListener('closeclick',function(){
-      infowindow.setMarker = null;
+      infowindow.marker = null;
     });
   }
 }
@@ -174,17 +179,22 @@ var ViewModel = {
     },
 
     search: function(value) {
-
         ViewModel.locationList.removeAll();
         for( var k = 0; k<locations.length; k++) {
             if (locations[k].title.toLowerCase().indexOf(value.toLowerCase()) >= 0) {
                 ViewModel.locationList.push(locations[k]);
+                markers[k].setVisible(true);
+                largeInfowindow.close();
+            }
+            else {
+                markers[k].setVisible(false);
             }
         }
 
     }
     
 }  
+
 ViewModel.ram();
 ViewModel.query.subscribe(ViewModel.search);
 

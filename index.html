@@ -7,6 +7,7 @@
 </head>
 
 <body>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <div class="container">
         <div class="options-box">
             <h1>Find anything in Kathmandu</h1>
@@ -17,7 +18,7 @@
             
             <ul id="location-list" data-bind="foreach: locationList">
                 <li>
-                    <span data-bind="text: title, click: $parent.popInfo"></span>
+                    <button data-bind="text: title, click: $parent.popInfo"></button>
                 </li>   
             </ul>           
         </div>   
@@ -30,6 +31,7 @@
 
     <script src="knockout-3.2.0.js"></script>
     <script src="app.js"></script>
+
 
 </body>
 </html>
