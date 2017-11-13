@@ -1,4 +1,5 @@
-var map, largeInfowindow, defaultIcon, bounds, highlightedIcon;
+var map, largeInfowindow, defaultIcon, bounds, highlightedIcon, s;
+let searchedForText;
 var markers = [];
 var locations = [
   {title: 'Pashupatinath Temple', location: {lat: 27.7105, lng: 85.3487}},
@@ -7,9 +8,9 @@ var locations = [
   {title: 'Kathmandu Durbar Square', location: {lat: 27.7043, lng: 85.3074}},
   {title: 'Sundarijal', location: {lat: 27.7909, lng: 85.4272}},
   {title: 'Budhanilkantha Temple', location: {lat: 27.7654, lng: 85.3653}},
-  {title: 'Swayambhu Stupa', location: {lat: 27.7148, lng: 85.2903}},
-  {title: 'Boudhanath Stupa', location: {lat: 27.7214, lng: 85.3619}},
-  {title: 'Changu Narayan Temple', location: {lat: 27.7162, lng: 85.4278}}                      
+  {title: 'Swayambhunath', location: {lat: 27.7148, lng: 85.2903}},
+  {title: 'Boudhanath', location: {lat: 27.7214, lng: 85.3619}},
+  {title: 'Changu Narayan T', location: {lat: 27.7162, lng: 85.4278}}                      
 ]; 
 
 var styles = [
@@ -154,7 +155,7 @@ function populateInfoWindow(marker, infowindow) {
   // Check to make sure the infowindow is not already opened on this marker.
   if (infowindow.marker != marker) {
     infowindow.marker = marker;
-    infowindow.setContent('<div>' + marker.title + '</div>');
+    //infowindow.setContent('<p>' + s + '<p>');
     infowindow.open(map, marker);
     // Make sure the marker property is cleared if the infowindow is closed.
     infowindow.addListener('closeclick',function(){
@@ -162,6 +163,7 @@ function populateInfoWindow(marker, infowindow) {
     });
   }
 }
+
 
 var ViewModel = {
     self: this,
@@ -176,6 +178,10 @@ var ViewModel = {
     popInfo: function(place) {
         var index = locations.indexOf(place);
         populateInfoWindow(markers[index], largeInfowindow);
+        passPlaceName(place.title);
+        startFetch(10, 200);
+
+
     },
 
     search: function(value) {
@@ -194,26 +200,29 @@ var ViewModel = {
     }
     
 }  
+function passPlaceName (name) {
+    searchedForText = name;
+}
 
 /* #########fetching data from wikipedia */
 var textbox = document.getElementById("textbox");
-    var button = document.getElementById("button");
+    //var button = document.getElementById("button");
     //var searchKeyword = document.getElementById("search-keyword").val;
     const searchField = document.querySelector('#search-keyword');
-    let searchedForText;
+    //let searchedForText;
         
     var tempscript = null, minchars, maxchars, attempts;
 
     function startFetch(minimumCharacters, maximumCharacters, isRetry) {
       event.preventDefault();
-      searchedForText = searchField.value;
+      //searchedForText = searchField.value;
       if (tempscript) return; // a fetch is already in progress
       if (!isRetry) {
         attempts = 0;
         minchars = minimumCharacters; // save params in case retry needed
         maxchars = maximumCharacters;
-        button.disabled = true;
-        button.style.cursor = "wait";
+        //button.disabled = true;
+        //button.style.cursor = "wait";
       }
       tempscript = document.createElement("script");
       tempscript.type = "text/javascript";
@@ -230,15 +239,22 @@ var textbox = document.getElementById("textbox");
     function onFetchComplete(data) {
       document.body.removeChild(tempscript);
       tempscript = null
-      var s = getFirstProp(data.query.pages).extract;
-      s = htmlDecode(stripTags(s));
-      if (s.length > minchars || attempts++ > 5) {
-        textbox.value = s;
-        button.disabled = false;
-        button.style.cursor = "auto";
+      s = getFirstProp(data.query.pages).extract;
+      if(s == undefined) {
+        //debugger
+        alert("Error, wikipedia search gives no result");
       } else {
-        startFetch(0, 0, true); // retry
-      }
+          s = htmlDecode(stripTags(s));
+          if (s.length > minchars || attempts++ > 5) {
+            textbox.value = s;
+            largeInfowindow.setContent('<p>' + s + '<p>');
+
+            //button.disabled = false;
+            //button.style.cursor = "auto";
+          } else {
+            startFetch(0, 0, true); // retry
+          }
+        }  
     }
 
     function getFirstProp(obj) {
@@ -257,7 +273,6 @@ var textbox = document.getElementById("textbox");
     }
 
 /*############################################## */
-
 
 ViewModel.ram();
 ViewModel.query.subscribe(ViewModel.search);
